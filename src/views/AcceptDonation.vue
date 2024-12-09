@@ -28,8 +28,12 @@ const donorVerified = ref(false);
 
 const checkStaff = async () => {
   try {
-    const response = await axios.get(`http://localhost:8080/staff/${staffID.value}`);
-    if (response.data.verified) {
+    const response = await axios.get(`http://localhost:8080/donations/isStaff`,{
+      params:{
+userName: staffID.value,
+      },
+    });
+    if (response.data.code>0) {
       isVerified.value = true;
       ElMessage.success('Staff verified successfully!');
     } else {
@@ -42,8 +46,12 @@ const checkStaff = async () => {
 
 const checkDonor = async () => {
   try {
-    const response = await axios.get(`http://localhost:8080/donors/${donorID.value}`);
-    if (response.data.registered) {
+    const response = await axios.get(`http://localhost:8080/donations/isDonor`,{
+      params:{
+userName: donorID.value,
+      },
+    });
+    if (response.data.code>0) {
       donorVerified.value = true;
       ElMessage.success('Donor verified successfully!');
     } else {
@@ -56,7 +64,7 @@ const checkDonor = async () => {
 
 const acceptDonation = async () => {
   try {
-    await axios.post('http://localhost:8080/donations', {
+    await axios.post('http://localhost:8080/donations/acceptDonations', {
       donorID: donorID.value,
       itemName: itemName.value,
       itemLocation: itemLocation.value,
