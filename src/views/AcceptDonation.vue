@@ -1,7 +1,5 @@
 <template>
   <div>
-    <el-input v-model="staffID" placeholder="Enter Staff ID"></el-input>
-    <el-button @click="checkStaff">Verify Staff</el-button>
     <div v-if="isVerified">
       <el-input v-model="donorID" placeholder="Enter Donor ID"></el-input>
       <el-button @click="checkDonor">Verify Donor</el-button>
@@ -15,11 +13,11 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
 
-const staffID = ref('');
+const staffID = localStorage.getItem('userName');
 const donorID = ref('');
 const itemName = ref('');
 const itemLocation = ref('');
@@ -28,16 +26,16 @@ const donorVerified = ref(false);
 
 const checkStaff = async () => {
   try {
-    const response = await axios.get(`http://localhost:8080/donations/isStaff`,{
-      params:{
-userName: staffID.value,
+    const response = await axios.get('http://localhost:8080/donations/isStaff', {
+      params: {
+        userName: staffID, // 不使用 staffID.value
       },
     });
-    if (response.data.code>0) {
+    if (response.data.code > 0) {
       isVerified.value = true;
       ElMessage.success('Staff verified successfully!');
     } else {
-      ElMessage.error('Invalid staff ID!');
+      ElMessage.error('You are not a staff!');
     }
   } catch (error) {
     ElMessage.error('Failed to verify staff: ' + (error.response?.data || 'Unknown error'));
@@ -46,12 +44,12 @@ userName: staffID.value,
 
 const checkDonor = async () => {
   try {
-    const response = await axios.get(`http://localhost:8080/donations/isDonor`,{
-      params:{
-userName: donorID.value,
+    const response = await axios.get('http://localhost:8080/donations/isDonor', {
+      params: {
+        userName: donorID.value,
       },
     });
-    if (response.data.code>0) {
+    if (response.data.code > 0) {
       donorVerified.value = true;
       ElMessage.success('Donor verified successfully!');
     } else {
@@ -74,4 +72,8 @@ const acceptDonation = async () => {
     ElMessage.error('Failed to accept donation: ' + (error.response?.data || 'Unknown error'));
   }
 };
+
+onMounted(() => {
+  checkStaff();
+});
 </script>
