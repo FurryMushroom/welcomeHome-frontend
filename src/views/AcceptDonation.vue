@@ -6,7 +6,12 @@
     </div>
     <div v-if="donorVerified">
       <el-input v-model="itemName" placeholder="Enter Item Name"></el-input>
-      <el-input v-model="itemLocation" placeholder="Enter Item Location"></el-input>
+      <el-input v-model="color" placeholder="Color"></el-input>
+      <el-switch v-model="hasPieces" active-text="Has Pieces" inactive-text="No Pieces" />
+<el-switch v-model="isNew" active-text="New" inactive-text="Not New" />
+      <el-input v-model="material" placeholder="Material"></el-input>
+      <el-input v-model="mainCategory" placeholder="Main Category"></el-input>
+      <el-input v-model="subCategory" placeholder="Sub Category"></el-input>
       <el-button @click="acceptDonation">Accept Donation</el-button>
     </div>
   </div>
@@ -16,13 +21,19 @@
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
+import DOMPurify from 'dompurify';
 
 const staffID = localStorage.getItem('userName');
 const donorID = ref('');
 const itemName = ref('');
-const itemLocation = ref('');
 const isVerified = ref(false);
 const donorVerified = ref(false);
+const color=ref('');
+const isNew =ref(false);
+const   hasPieces= ref(false);
+const material=ref('');
+const mainCategory=ref('');
+const subCategory=ref('');
 
 const checkStaff = async () => {
   try {
@@ -62,12 +73,30 @@ const checkDonor = async () => {
 
 const acceptDonation = async () => {
   try {
-    await axios.post('http://localhost:8080/donations/acceptDonations', {
-      donorID: donorID.value,
-      itemName: itemName.value,
-      itemLocation: itemLocation.value,
-    });
-    ElMessage.success('Donation accepted successfully!');
+// 当用户点击提交（acceptDonation）时，对文本类输入进行清理
+const sanitizedItemName = DOMPurify.sanitize(itemName.value);
+const sanitizedColor = DOMPurify.sanitize(color.value);
+const sanitizedMaterial = DOMPurify.sanitize(material.value);
+const sanitizedMainCategory = DOMPurify.sanitize(mainCategory.value);
+const sanitizedSubCategory = DOMPurify.sanitize(subCategory.value);
+
+    const response = await axios.post('http://localhost:8080/donations/acceptDonations', {
+  userName: donorID.value,
+  iDescription: sanitizedItemName,
+  color: sanitizedColor,
+  isNew: isNew.value,
+  hasPieces: hasPieces.value,
+  material: sanitizedMaterial,
+  mainCategory: sanitizedMainCategory,
+  subCategory: sanitizedSubCategory,
+});
+
+    
+    if (response.data.code > 0) {
+      ElMessage.success('Donation accepted successfully!');
+    } else {
+      ElMessage.error('Failed to accept donation!');
+    }
   } catch (error) {
     ElMessage.error('Failed to accept donation: ' + (error.response?.data || 'Unknown error'));
   }

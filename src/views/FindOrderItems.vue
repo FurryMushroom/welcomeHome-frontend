@@ -25,7 +25,7 @@
 import { ref } from 'vue';
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
-
+import DOMpurify from 'dompurify';
 const orderID = ref('');
 const items = ref([]);
 
@@ -41,7 +41,7 @@ const findOrder = async () => {
     return;
   }
   try {
-    const response = await axios.get(`http://localhost:8080/items/order/${orderID.value}`, {
+    const response = await axios.get(`http://localhost:8080/items/order/${DOMpurify.sanitize(orderID.value)}`, {
       headers: { token },
     });
     if(response.data.code>0)
