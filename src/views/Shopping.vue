@@ -19,9 +19,10 @@
     <!-- 物品列表 -->
     <div v-if="items.length > 0" style="margin-top: 20px;">
       <el-table :data="items" style="width: 100%">
-        <el-table-column prop="name" label="Item Name" width="200" />
-        <el-table-column prop="description" label="Description" />
-        <el-table-column prop="quantity" label="Available Quantity" width="150" />
+        <el-table-column prop="idescription" label="Description" width="230"  />
+        <el-table-column prop="material" label="Material" />
+        <el-table-column prop="color" label="Color" />
+        <el-table-column prop="new" label="Is New" />
         <el-table-column label="Actions" width="150">
           <template #default="scope">
             <el-button

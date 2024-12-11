@@ -53,33 +53,7 @@ const routes = [
       ],
     },
   ];
-// const routes = [
-//     {
-//         path: '/itemView',
-//         name: 'ItemView',
-//         component: () => import('@/views/ItemView.vue'),
-//     },
-//     {
-//         path: '/',
-//         name: 'Login',
-//         component: () => import('@/views/Login.vue'),
-//     },
-//     {
-//         path: '/findSingleItem',
-//         name: 'FindSingleItem',
-//         component: () => import('@/views/FindSingleItem.vue'),
-//     },
-//     {
-//         path: '/findOrderItems',
-//         name: 'FindOrderItems',
-//         component: () => import('@/views/FindOrderItems.vue'),
-//     },
-//     {
-//         path: '/acceptDonation',
-//         name: 'AcceptDonation',
-//         component: () => import('@/views/AcceptDonation.vue'),
-//     },
-// ];
+
 const router = createRouter({
     history: createWebHistory(),
     routes,

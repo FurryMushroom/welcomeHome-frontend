@@ -53,19 +53,20 @@ const logout = () => {
 }
 
 .el-main {
-  overflow: auto;
-  height: 100%;
+  display: flex;
+  flex: 1;
 }
 
+
 .content-container {
-  max-width: 80%; /* 宽度占比 */
-  margin: 0 auto; /* 居中显示 */
+  margin: 0 auto;
   background: #ffffff;
   padding: 20px;
-  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1); /* 添加阴影 */
-  border-radius: 8px; /* 圆角 */
-  min-height: calc(100vh - 40px); /* 保证占满高度 */
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  min-height: calc(100vh - 40px);
 }
+
 
 body {
   margin: 0;
