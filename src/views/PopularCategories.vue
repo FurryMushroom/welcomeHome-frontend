@@ -68,6 +68,12 @@ const formatDate = (date) => {
 
 // 获取热门分类的函数
 const fetchPopularCategories = async () => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    ElMessage.error('Please log in first!');
+    return;
+  }
+
   console.log('Fetch button clicked'); // 确认按钮点击
   try {
     // 验证日期范围

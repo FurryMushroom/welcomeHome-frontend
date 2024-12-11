@@ -61,6 +61,12 @@ const currentOrderId = localStorage.getItem('orderId'); // 当前订单 ID
 
 // 获取所有类别
 const fetchCategories = async () => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    ElMessage.error('Please log in first!');
+    return;
+  }
+
   try {
     const response = await axios.get('http://localhost:8080/order/getExistingCategory');
     if (response.data && response.data.data) {
@@ -106,7 +112,7 @@ const addToOrder = async (item) => {
 
   try {
     const orderDTO = {
-      itemID: item.id,
+      itemID: item.itemID,
       orderID: currentOrderId, 
       supervisor: localStorage.getItem('userName'), 
       client: localStorage.getItem('client'), 

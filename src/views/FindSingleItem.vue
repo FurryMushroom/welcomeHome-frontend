@@ -5,25 +5,30 @@
     <el-button @click="findItem">Find Item</el-button>
 
     <!-- 查询结果展示 -->
-    <div v-if="hasQueried">
+    <div v-if="hasQueried" style="margin-top: 20px;">
       <!-- 有 location 数据时 -->
       <div v-if="locations && locations.length">
         <h3>Locations</h3>
-        <ul>
-          <li v-for="(location, index) in locations" :key="index">
-            {{ location }}
-          </li>
-        </ul>
+        <el-table :data="locations" style="width: 100%; margin-top: 10px;">
+          <el-table-column prop="pieceNum" label="Piece Number" width="120" />
+          <el-table-column prop="roomNum" label="Room Number" width="120" />
+          <el-table-column prop="shelfNum" label="Shelf Number" width="120" />
+          <el-table-column prop="shelfDescription" label="Shelf Description" width="180"/>
+          <el-table-column prop="pdescription" label="Description" width="180"/>
+        </el-table>
       </div>
       <!-- 无 location 数据时 -->
       <div v-else>
-        <el-alert title="No location information found for this item." type="warning" show-icon></el-alert>
+        <el-alert 
+          title="No location information found for this item." 
+          type="warning" 
+          show-icon
+          style="margin-top: 10px;"
+        />
       </div>
     </div>
   </div>
 </template>
-
-
 
 <script setup>
 import { ref } from 'vue';
@@ -55,12 +60,12 @@ const findItem = async () => {
     hasQueried.value = true;
 
     // 处理 locations 数据
-    if (response.data.locations) {
-      locations.value = response.data.locations; // 有 location 信息
+    if (response.data.code>0) {
+      locations.value = response.data.data; // 有 location 信息
       ElMessage.success('Item found successfully!');
     } else {
       locations.value = null; // 没有 location 信息
-      ElMessage.warning('Item found but no location information is available.');
+      ElMessage.warning('Location not found!');
     }
   } catch (error) {
     hasQueried.value = true; // 查询失败也标记为查询完成

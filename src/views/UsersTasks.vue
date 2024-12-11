@@ -8,18 +8,17 @@
     <!-- 如果有订单，展示表格 -->
     <div v-if="orders.length > 0" style="margin-top: 20px;">
       <el-table :data="orders" style="width: 100%">
-        <el-table-column prop="orderId" label="Order ID" width="150"></el-table-column>
-        <el-table-column prop="status" label="Status" width="150"></el-table-column>
-        <el-table-column label="Items">
-          <template #default="scope">
-            <ul>
-              <li v-for="item in scope.row.items" :key="item.id">
-                {{ item.name }} (x{{ item.quantity }})
-              </li>
-            </ul>
-          </template>
-        </el-table-column>
-        <el-table-column prop="createdAt" label="Created At" width="200"></el-table-column>
+        <el-table-column prop="orderID" label="Order ID" ></el-table-column>
+        <el-table-column prop="status" label="Status" ></el-table-column>
+        <el-table-column prop="client" label="Client" ></el-table-column>
+        <el-table-column prop="supervisor" label="Supervisor"></el-table-column>
+        <el-table-column prop="orderDate" label="Order Date"></el-table-column>
+        <el-table-column prop="itemID" label="Item ID" ></el-table-column>
+        <el-table-column prop="idescription" label="Item Description" ></el-table-column>
+        <el-table-column prop="deliveredDate" label="Delivered Date" ></el-table-column>
+        <el-table-column prop="deliveredBy" label="Delivered By" ></el-table-column>
+        <el-table-column prop="donor" label="Donor" ></el-table-column>
+        <el-table-column prop="donateDate" label="Donate Date" ></el-table-column>
       </el-table>
     </div>
 
@@ -59,7 +58,8 @@ const fetchUserOrders = async () => {
     });
 
     // 根据响应处理数据
-    if (response.data && response.data.data) {
+    if (response.data.code>0) {
+      ElMessage.success('Logged in User\'s tasks found successfully!');
       orders.value = response.data.data;
     } else {
       ElMessage.warning('No relevant orders found.');

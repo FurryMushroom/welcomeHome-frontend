@@ -38,10 +38,18 @@ const startOrder = async () => {
     ElMessage.error('Invalid client username!');
     return;
   }
+  if(clientUsername.value==localStorage.getItem("userName")){
+    ElMessage.error('You cannot start order for urself!');
+    return;
+  }
   // Step 3: 发送创建订单请求
   try {
   const response = await axios.get('http://localhost:8080/order/newOrder', {
     headers: { token },
+    params:{
+  client:clientUsername.value,
+  supervisor:localStorage.getItem("userName"),
+}
   });
 
   if (response && response.data) {

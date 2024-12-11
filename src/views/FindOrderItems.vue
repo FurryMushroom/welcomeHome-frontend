@@ -7,21 +7,13 @@
       <!-- 物品列表 -->
     <div v-if="items.length > 0" style="margin-top: 20px;">
       <el-table :data="items" style="width: 100%">
-        <el-table-column prop="idescription" label="Description" width="230"  />
-        <el-table-column prop="material" label="Material" />
-        <el-table-column prop="color" label="Color" />
-        <el-table-column prop="new" label="Is New" />
-        <el-table-column label="Actions" width="150">
-          <template #default="scope">
-            <el-button
-              type="primary"
-              size="small"
-              @click="addToOrder(scope.row)"
-            >
-              Add to Order
-            </el-button>
-          </template>
-        </el-table-column>
+        <el-table-column prop="itemID" label="Item ID" />
+        <el-table-column prop="idescription" label="Description" width="170"  />
+        <el-table-column prop="roomNum" label="Room Number" />
+        <el-table-column prop="shelfNum" label="Shelf Number" />
+        <el-table-column prop="shelfDescription" label="Shelf Description" width="150"/>
+        <el-table-column prop="pDescription" label="Piece Description" width="150"  />
+        <el-table-column prop="pieceNum" label="Number of Pieces" />
       </el-table>
     </div>
       
@@ -35,21 +27,30 @@ import axios from 'axios';
 import { ElMessage } from 'element-plus';
 
 const orderID = ref('');
-const items = ref(null);
+const items = ref([]);
 
 const findOrder = async () => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    ElMessage.error('Please log in first!');
+    return;
+  }
+
   if (!orderID.value) {
     ElMessage.error('Please enter an Order ID!');
     return;
   }
   try {
-    const response = await axios.get(`http://localhost:8080/items/order`,{
-params:{
-  orderid:orderID.value,
-}
+    const response = await axios.get(`http://localhost:8080/items/order/${orderID.value}`, {
+      headers: { token },
     });
-    items.value = response.data.items;
-    ElMessage.success('Order found successfully!');
+    if(response.data.code>0)
+    {
+    items.value = response.data.data;
+    ElMessage.success('Order found successfully!');}
+    else {
+      ElMessage.warning('No item found!');
+    }
   } catch (error) {
     ElMessage.error('Failed to find order: ' + (error.response?.data || 'Unknown error'));
   }
