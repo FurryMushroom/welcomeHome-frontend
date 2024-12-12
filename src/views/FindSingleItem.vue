@@ -35,6 +35,7 @@ import { ref } from 'vue';
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
 import DOMpurify from 'dompurify';
+
 const itemID = ref(''); // 用户输入的 Item ID
 const locations = ref(null); // 初始值为 null，表示未查询
 const hasQueried = ref(false); // 是否进行了查询

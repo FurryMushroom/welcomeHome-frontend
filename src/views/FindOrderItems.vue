@@ -2,10 +2,10 @@
   <div>
     <el-input v-model="orderID" placeholder="Enter Order ID"></el-input>
     <el-button @click="findOrder">Find Order</el-button>
-    <div v-if="items">
+    <div v-if="hasQueried" style="margin-top: 20px;">
       <h3>Order Items:</h3>
       <!-- 物品列表 -->
-    <div v-if="items.length > 0" style="margin-top: 20px;">
+    <div v-if="items && items.length > 0" style="margin-top: 20px;">
       <el-table :data="items" style="width: 100%">
         <el-table-column prop="itemID" label="Item ID" />
         <el-table-column prop="idescription" label="Description" width="170"  />
@@ -16,7 +16,14 @@
         <el-table-column prop="pieceNum" label="Number of Pieces" />
       </el-table>
     </div>
-      
+    <div v-else>
+        <el-alert 
+          title="No location information found for this order." 
+          type="warning" 
+          show-icon
+          style="margin-top: 10px;"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -25,9 +32,11 @@
 import { ref } from 'vue';
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
-import DOMpurify from 'dompurify';
+
 const orderID = ref('');
-const items = ref([]);
+const items = ref(null);
+const hasQueried = ref(false);
+
 
 const findOrder = async () => {
   const token = localStorage.getItem('token');
@@ -41,18 +50,23 @@ const findOrder = async () => {
     return;
   }
   try {
-    const response = await axios.get(`http://localhost:8080/items/order/${DOMpurify.sanitize(orderID.value)}`, {
+    const response = await axios.get(`http://localhost:8080/items/order/${orderID.value}`, {
       headers: { token },
     });
+
+    hasQueried.value = true;
+
     if(response.data.code>0)
     {
     items.value = response.data.data;
     ElMessage.success('Order found successfully!');}
     else {
       ElMessage.warning('No item found!');
+      items.value = null;
     }
   } catch (error) {
     ElMessage.error('Failed to find order: ' + (error.response?.data || 'Unknown error'));
+    items.value = null;
   }
 };
 </script>

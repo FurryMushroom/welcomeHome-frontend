@@ -5,13 +5,28 @@
       <el-button @click="checkDonor">Verify Donor</el-button>
     </div>
     <div v-if="donorVerified">
-      <el-input v-model="itemName" placeholder="Enter Item Name"></el-input>
-      <el-input v-model="color" placeholder="Color"></el-input>
-      <el-switch v-model="hasPieces" active-text="Has Pieces" inactive-text="No Pieces" />
-<el-switch v-model="isNew" active-text="New" inactive-text="Not New" />
-      <el-input v-model="material" placeholder="Material"></el-input>
-      <el-input v-model="mainCategory" placeholder="Main Category"></el-input>
-      <el-input v-model="subCategory" placeholder="Sub Category"></el-input>
+      <el-input v-model="form.itemID" placeholder="Enter ItemID (Optional)"></el-input>
+      <el-input v-model="form.iDescription" placeholder="Enter Item Name"></el-input>
+      <el-input v-model="form.color" placeholder="Enter Item Color"></el-input>
+      <el-switch v-model="form.isNew" active-text="New" inactive-text="Not New"></el-switch>
+      <el-switch v-model="form.hasPieces" active-text="Has Pieces" inactive-text="No Pieces"></el-switch>
+      <el-input v-model="form.material" placeholder="Enter Material"></el-input>
+      <el-input v-model="form.mainCategory" placeholder="Enter Main Category"></el-input>
+      <el-input v-model="form.subCategory" placeholder="Enter Sub Category"></el-input>
+      <div>
+        <h3>Pieces</h3>
+        <el-button type="primary" @click="addPiece">Add Piece</el-button>
+        <div v-for="(piece, index) in form.pieces" :key="index" style="margin-bottom: 10px;">
+          <el-input v-model="piece.pDescription" placeholder="Enter Piece Description"></el-input>
+          <el-input v-model="piece.length" type="number" placeholder="Enter Length"></el-input>
+          <el-input v-model="piece.width" type="number" placeholder="Enter Width"></el-input>
+          <el-input v-model="piece.height" type="number" placeholder="Enter Height"></el-input>
+          <el-input v-model="piece.roomNum" placeholder="Enter Room Number"></el-input>
+          <el-input v-model="piece.shelfNum" placeholder="Enter Shelf Number"></el-input>
+          <el-input v-model="piece.pNotes" placeholder="Enter Piece Notes"></el-input>
+          <el-button type="danger" @click="removePiece(index)">Remove</el-button>
+        </div>
+      </div>
       <el-button @click="acceptDonation">Accept Donation</el-button>
     </div>
   </div>
@@ -21,26 +36,28 @@
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
-import DOMPurify from 'dompurify';
 
-const staffID = localStorage.getItem('userName');
+const staffID = localStorage.getItem('userName'); // Ensure it's not null
 const donorID = ref('');
-const itemName = ref('');
+const form = ref({
+  itemID: '',
+  iDescription: '',
+  color: '',
+  isNew: false,
+  hasPieces: false,
+  material: '',
+  mainCategory: '',
+  subCategory: '',
+  pieces: []
+});
+
 const isVerified = ref(false);
 const donorVerified = ref(false);
-const color=ref('');
-const isNew =ref(false);
-const   hasPieces= ref(false);
-const material=ref('');
-const mainCategory=ref('');
-const subCategory=ref('');
 
 const checkStaff = async () => {
   try {
     const response = await axios.get('http://localhost:8080/donations/isStaff', {
-      params: {
-        userName: staffID, // 不使用 staffID.value
-      },
+      params: { userName: staffID }
     });
     if (response.data.code > 0) {
       isVerified.value = true;
@@ -56,9 +73,7 @@ const checkStaff = async () => {
 const checkDonor = async () => {
   try {
     const response = await axios.get('http://localhost:8080/donations/isDonor', {
-      params: {
-        userName: donorID.value,
-      },
+      params: { userName: donorID.value }
     });
     if (response.data.code > 0) {
       donorVerified.value = true;
@@ -73,33 +88,34 @@ const checkDonor = async () => {
 
 const acceptDonation = async () => {
   try {
-// 当用户点击提交（acceptDonation）时，对文本类输入进行清理
-const sanitizedItemName = DOMPurify.sanitize(itemName.value);
-const sanitizedColor = DOMPurify.sanitize(color.value);
-const sanitizedMaterial = DOMPurify.sanitize(material.value);
-const sanitizedMainCategory = DOMPurify.sanitize(mainCategory.value);
-const sanitizedSubCategory = DOMPurify.sanitize(subCategory.value);
+    const itemIDToSubmit = form.value.itemID || '1111';
 
-    const response = await axios.post('http://localhost:8080/donations/acceptDonations', {
-  userName: donorID.value,
-  iDescription: sanitizedItemName,
-  color: sanitizedColor,
-  isNew: isNew.value,
-  hasPieces: hasPieces.value,
-  material: sanitizedMaterial,
-  mainCategory: sanitizedMainCategory,
-  subCategory: sanitizedSubCategory,
-});
+    await axios.post('http://localhost:8080/donations/acceptDonations', {
+      itemID: itemIDToSubmit,
+      userName: donorID.value,
+      iDescription: form.value.iDescription,
+      color: form.value.color,
+      isNew: form.value.isNew,
+      hasPieces: form.value.hasPieces,
+      material: form.value.material,
+      mainCategory: form.value.mainCategory,
+      subCategory: form.value.subCategory,
+      pieces: form.value.pieces,
+    });
 
-    
-    if (response.data.code > 0) {
-      ElMessage.success('Donation accepted successfully!');
-    } else {
-      ElMessage.error('Failed to accept donation!');
-    }
+    ElMessage.success('Donation accepted successfully!');
   } catch (error) {
     ElMessage.error('Failed to accept donation: ' + (error.response?.data || 'Unknown error'));
   }
+};
+
+// Methods for adding/removing pieces
+const addPiece = () => {
+  form.value.pieces.push({ name: '', size: '' });
+};
+
+const removePiece = (index) => {
+  form.value.pieces.splice(index, 1);
 };
 
 onMounted(() => {

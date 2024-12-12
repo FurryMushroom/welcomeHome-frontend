@@ -14,7 +14,8 @@
 import { ref } from 'vue';
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
-import DOMPurify from 'dompurify';
+import { routerKey } from 'vue-router';
+
 const clientUsername = ref('');
 
 const startOrder = async () => {
@@ -32,7 +33,7 @@ const startOrder = async () => {
   }
 
   // Step 2: 检查客户端用户名是否合法
-  const isValidClient = await checkIsRegisteredUser(DOMPurify.sanitize(clientUsername.value), token);
+  const isValidClient = await checkIsRegisteredUser(clientUsername.value, token);
   if (isValidClient>0) {
     ElMessage.error('Invalid client username!');
     return;
@@ -46,8 +47,8 @@ const startOrder = async () => {
   const response = await axios.get('http://localhost:8080/order/newOrder', {
     headers: { token },
     params:{
-  client:clientUsername.value,
-  supervisor:localStorage.getItem("userName"),
+      client:clientUsername.value,
+      supervisor:localStorage.getItem("userName"),
 }
   });
 
